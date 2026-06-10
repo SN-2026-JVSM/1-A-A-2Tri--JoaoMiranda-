@@ -185,7 +185,6 @@
       color: var(--muted); font-size: .83rem;
     }
 
-    /* ── Paginacao ───────────────────────────────────── */
     .pagination {
       display: flex; align-items: center; gap: .5rem;
       margin-top: .75rem; font-size: .78rem; color: var(--muted);
@@ -215,7 +214,6 @@
 </head>
 <body>
 
-  <!-- ⚠️ CONFIGURACAO — Substitua pelos valores do seu projeto Supabase -->
   <script>
     const SUPABASE_URL      = "https://zlynrsswhqbmnydpvcft.supabase.co";
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpseW5yc3N3aHFibW55ZHB2Y2Z0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA4OTMwODAsImV4cCI6MjA5NjQ2OTA4MH0.a4ipAIu8S0mIbmAs_3HiNO83oak1ocoE5dsvocLwWEY";
@@ -427,8 +425,16 @@
     /* ── Selects cascata ────────────────────────── */
     async function loadAirports() {
       try {
-        const r = await fetch('data/airports.json');
-        airports = await r.json();
+        // Busca aeroportos do Supabase (substitui o antigo data/airports.json)
+        const rows = await sbFetch('aeroportos?select=icao,iata,nome,cidade,estado&order=estado.asc,cidade.asc');
+        // Mapeia colunas do banco para o formato esperado pelo restante do código
+        airports = rows.map(a => ({
+          icao:  a.icao,
+          iata:  a.iata,
+          name:  a.nome,
+          city:  a.cidade,
+          state: a.estado,
+        }));
         const states = [...new Set(airports.map(a => a.state))].sort();
         const sel = document.getElementById('sel-state');
         sel.innerHTML = '<option value="">Todos os estados</option>';
